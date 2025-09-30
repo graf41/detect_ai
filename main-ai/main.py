@@ -61,8 +61,8 @@ torch.backends.cudnn.benchmark = True
 
 SEED = 42
 random.seed(SEED); np.random.seed(SEED); torch.manual_seed(SEED)
-DATA_DIR = Path("data/train")
-REPORTS  = Path("reports"); REPORTS.mkdir(exist_ok=True)
+DATA_DIR = Path("../data/train")
+REPORTS  = Path("../reports"); REPORTS.mkdir(exist_ok=True)
 IMG_SIZE, BATCH, LR = 224, 32, 3e-4
 PATIENCE, EPS       = 2,   1e-4
 
