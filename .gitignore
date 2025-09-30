@@ -40,8 +40,8 @@ ENV/
 *.swo
 
 # Данные и модели
-data/
-reports/
+kotlin-app/data/
+kotlin-app/reports/
 *.pt
 *.pth
 *.onnx
