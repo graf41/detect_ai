@@ -49,8 +49,7 @@ def build_model() -> nn.Module:
 # Загружаем модель (замените путь на ваш сохраненный файл модели)
 try:
     model = build_model()
-    # ЗАМЕНИТЕ ЭТУ СТРОКУ НА ПУТЬ К ВАШЕЙ СОХРАНЕННОЙ МОДЕЛИ
-    model.load_state_dict(torch.load('reports/best.pt', map_location=device))
+    model.load_state_dict(torch.load('../reports/best.pt', map_location=device))
     model.eval()
     logger.info("✅ Model loaded successfully")
 except Exception as e:
@@ -70,7 +69,6 @@ def predict(image_data: bytes) -> dict:
         image = Image.open(io.BytesIO(image_data)).convert('RGB')
         image_tensor = val_tfms(image).unsqueeze(0).to(device)
 
-        # Предсказание (из вашего кода)
         with torch.no_grad():
             output = model(image_tensor)
             probability = torch.softmax(output, dim=1)[0][1].item()
@@ -101,11 +99,9 @@ def predict(image_data: bytes) -> dict:
 async def analyze_image(image: UploadFile = File(...)):
     """API endpoint для анализа изображения"""
     try:
-        # Проверяем тип файла
         if not image.content_type.startswith('image/'):
             return {"error": "File is not an image"}
 
-        # Читаем изображение
         image_data = await image.read()
 
         if len(image_data) == 0:
