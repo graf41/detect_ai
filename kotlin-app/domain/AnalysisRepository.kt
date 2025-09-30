@@ -1,137 +1,152 @@
-// android-app/src/main/kotlin/com/malaria/data/api/MLApiService.kt
-package com.malaria.data.api
+// kotlin-app/data/repository/AnalysisRepository.kt
+package com.malaria.data.repository
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.append
-import io.ktor.utils.io.core.buildPacket
-import io.ktor.utils.io.core.writeFully
+import com.malaria.domain.models.AnalysisResult
+import com.malaria.data.api.MLApiService
+import com.malaria.data.api.HealthResponse
+import com.malaria.data.api.ModelInfoResponse
 import java.io.File
 
 /**
- * HTTP клиент для взаимодействия с Python ML API
- * Отправляет изображения на анализ и получает результаты
+ * Репозиторий для работы с анализом изображений
+ * Управляет вызовами API и преобразует данные между слоями
  */
-class MLApiService(
-    private val baseUrl: String = "http://localhost:8000",
-    private val client: HttpClient
+class AnalysisRepository(
+    private val mlApiService: MLApiService
 ) {
 
     /**
-     * Анализирует изображение с помощью ML модели
-     * @param imageBytes байты изображения для анализа
-     * @return результат анализа или null в случае ошибки
+     * Анализирует изображение через ML API
+     * @param imageFile файл изображения для анализа
+     * @return результат анализа
      */
-    suspend fun analyzeImage(imageBytes: ByteArray): AnalysisResponse? {
+    suspend fun analyzeImage(imageFile: File): AnalysisResult {
         return try {
-            val response: AnalysisResponse = client.post("$baseUrl/analyze") {
-                setBody(
-                    MultiPartFormDataContent(
-                        formData {
-                            append(
-                                "image",
-                                imageBytes,
-                                Headers.build {
-                                    append(HttpHeaders.ContentType, "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=image; filename=image.jpg")
-                                }
-                            )
-                        }
-                    )
-                )
-            }.body()
+            // Читаем байты файла
+            val imageBytes = imageFile.readBytes()
 
-            response
+            // Вызываем API
+            val response = mlApiService.analyzeImage(imageBytes)
+
+            // Преобразуем ответ API в доменную модель
+            response?.toDomainModel() ?: AnalysisResult(
+                diagnosis = AnalysisResult.Diagnosis.ERROR,
+                confidence = 0.0,
+                processingTime = 0.0,
+                modelUsed = "",
+                errorMessage = "Не удалось получить ответ от ML API"
+            )
+
         } catch (e: Exception) {
-            // В реальном приложении здесь должно быть логирование
-            println("Ошибка при анализе изображения: ${e.message}")
-            null
+            // Обработка ошибок чтения файла или сети
+            AnalysisResult(
+                diagnosis = AnalysisResult.Diagnosis.ERROR,
+                confidence = 0.0,
+                processingTime = 0.0,
+                modelUsed = "",
+                errorMessage = "Ошибка при анализе: ${e.message}"
+            )
         }
     }
 
     /**
-     * Проверяет доступность ML API сервера
-     * @return true если сервер доступен, false в случае ошибки
+     * Анализирует изображение из байтов
+     * @param imageBytes байты изображения
+     * @return результат анализа
+     */
+    suspend fun analyzeImage(imageBytes: ByteArray): AnalysisResult {
+        return try {
+            val response = mlApiService.analyzeImage(imageBytes)
+            response?.toDomainModel() ?: AnalysisResult(
+                diagnosis = AnalysisResult.Diagnosis.ERROR,
+                confidence = 0.0,
+                processingTime = 0.0,
+                modelUsed = "",
+                errorMessage = "Пустой ответ от ML API"
+            )
+        } catch (e: Exception) {
+            AnalysisResult(
+                diagnosis = AnalysisResult.Diagnosis.ERROR,
+                confidence = 0.0,
+                processingTime = 0.0,
+                modelUsed = "",
+                errorMessage = "Сетевая ошибка: ${e.message}"
+            )
+        }
+    }
+
+    /**
+     * Проверяет доступность ML API
+     * @return true если API доступен и модель загружена
      */
     suspend fun checkHealth(): Boolean {
         return try {
-            val response: HealthResponse = client.get("$baseUrl/health").body()
-            response.status == "healthy" && response.model_loaded == true
+            mlApiService.checkHealth()
         } catch (e: Exception) {
-            println("ML API недоступен: ${e.message}")
             false
         }
     }
 
     /**
-     * Получает информацию о загруженной ML модели
-     * @return информация о модели или null в случае ошибки
+     * Получает детальную информацию о здоровье API
+     * @return информация о состоянии API или null при ошибке
+     */
+    suspend fun getHealthInfo(): HealthResponse? {
+        return try {
+            mlApiService.getHealthInfo()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Получает информацию о ML модели
+     * @return информация о модели или null при ошибке
      */
     suspend fun getModelInfo(): ModelInfoResponse? {
         return try {
-            client.get("$baseUrl/model-info").body()
+            mlApiService.getModelInfo()
         } catch (e: Exception) {
-            println("Ошибка при получении информации о модели: ${e.message}")
             null
+        }
+    }
+
+    /**
+     * Проверяет поддерживается ли файл для анализа
+     * @param file файл для проверки
+     * @return true если файл поддерживается
+     */
+    fun isFileSupported(file: File): Boolean {
+        if (!file.exists() || file.length() == 0L) return false
+
+        val supportedExtensions = setOf("jpg", "jpeg", "png", "bmp", "webp")
+        val extension = file.extension.lowercase()
+
+        return supportedExtensions.contains(extension)
+    }
+
+    /**
+     * Получает размер файла в читаемом формате
+     * @param file файл для проверки
+     * @return строка с размером (например "2.5 MB")
+     */
+    fun getFileSizeReadable(file: File): String {
+        val bytes = file.length()
+        val kb = bytes / 1024.0
+        val mb = kb / 1024.0
+
+        return when {
+            mb >= 1 -> "%.1f MB".format(mb)
+            kb >= 1 -> "%.1f KB".format(kb)
+            else -> "$bytes B"
         }
     }
 }
 
 /**
- * Ответ от API анализа изображения
+ * Расширение для конвертации API ответа в доменную модель
  */
-data class AnalysisResponse(
-    val diagnosis: String,           // "parasitized" или "uninfected"
-    val confidence: Double,          // Уверенность предсказания (0.0 - 1.0)
-    val processing_time: Double,     // Время обработки в секундах
-    val model_used: String? = null,  // Использованная модель
-    val error: String? = null        // Сообщение об ошибке (если есть)
-)
-
-/**
- * Ответ от health check endpoint
- */
-data class HealthResponse(
-    val status: String,              // "healthy" или "model_not_loaded"
-    val service: String,             // Название сервиса
-    val device: String,              // Устройство выполнения (CPU/GPU)
-    val model_loaded: Boolean        // Загружена ли модель
-)
-
-/**
- * Информация о ML модели
- */
-data class ModelInfoResponse(
-    val model_name: String,          // Название модели
-    val total_parameters: Long,      // Количество параметров
-    val input_size: Int,             // Размер входного изображения
-    val device: String               // Устройство выполнения
-)
-
-/**
- * Результат анализа для использования в UI
- */
-data class AnalysisResult(
-    val diagnosis: Diagnosis,
-    val confidence: Double,
-    val processingTime: Double,
-    val modelUsed: String
-) {
-    enum class Diagnosis {
-        PARASITIZED, UNINFECTED, ERROR
-    }
-}
-
-/**
- * Расширение для конвертации API ответа в доменный объект
- */
-fun AnalysisResponse.toDomainModel(): AnalysisResult {
+private fun AnalysisResponse.toDomainModel(): AnalysisResult {
     val diagnosis = when (this.diagnosis.lowercase()) {
         "parasitized" -> AnalysisResult.Diagnosis.PARASITIZED
         "uninfected" -> AnalysisResult.Diagnosis.UNINFECTED
@@ -142,6 +157,7 @@ fun AnalysisResponse.toDomainModel(): AnalysisResult {
         diagnosis = diagnosis,
         confidence = this.confidence,
         processingTime = this.processing_time,
-        modelUsed = this.model_used ?: "EfficientNet-B0"
+        modelUsed = this.model_used ?: "EfficientNet-B0",
+        errorMessage = this.error
     )
 }
