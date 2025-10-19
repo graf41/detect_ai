@@ -41,17 +41,12 @@ ENV/
 
 # Данные и модели
 kotlin-app/data/
-kotlin-app/reports/
-*.pt
-*.pth
-*.onnx
-*.pkl
-*.joblib
+ml-api/reports/
+
+# Gradle
+kotlin-app/build/
+.gradle/
 
 # Логи
 *.log
 logs/
-
-# Временные файлы
-*.tmp
-*.temp
