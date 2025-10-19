@@ -62,8 +62,8 @@ torch.backends.cudnn.benchmark = True
 SEED = 42
 random.seed(SEED); np.random.seed(SEED); torch.manual_seed(SEED)
 DATA_DIR = Path("../kotlin-app/data/train")
-REPORTS  = Path("../kotlin-app/reports"); REPORTS.mkdir(exist_ok=True)
-IMG_SIZE, BATCH, LR = 224, 32, 3e-4
+REPORTS  = REPORTS = Path("../ml-api/reports"); REPORTS.mkdir(exist_ok=True)
+IMG_SIZE, BATCH, LR = 224, 16, 3e-4
 PATIENCE, EPS       = 2,   1e-4
 
 train_tfms = transforms.Compose([
