@@ -49,7 +49,7 @@ def build_model() -> nn.Module:
 # Загружаем модель (замените путь на ваш сохраненный файл модели)
 try:
     model = build_model()
-    model.load_state_dict(torch.load('../reports/best.pt', map_location=device))
+    model.load_state_dict(torch.load('./reports/best.pt', map_location=device))
     model.eval()
     logger.info("✅ Model loaded successfully")
 except Exception as e:
@@ -71,7 +71,7 @@ def predict(image_data: bytes) -> dict:
 
         with torch.no_grad():
             output = model(image_tensor)
-            probability = torch.softmax(output, dim=1)[0][1].item()
+            probability = torch.softmax(output, dim=1)[0][0].item()
 
         processing_time = time.time() - start_time
 
