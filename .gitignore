@@ -43,7 +43,8 @@ ENV/
 ml/training/data/
 !ml/training/data/.gitkeep
 ml/api/reports/
-
+kotlin-app/data/
+ml-api/reports/
 
 # Gradle
 kotlin-app/build/
@@ -57,10 +58,3 @@ kapitol/
 # Логи
 *.log
 logs/
-
-# Данные обучения
-ml/training/data/
-!ml/training/data/.gitkeep
-
-# Модели ML API
-ml/api/reports/
