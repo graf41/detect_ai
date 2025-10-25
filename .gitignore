@@ -40,12 +40,20 @@ ENV/
 *.swo
 
 # Данные и модели
+ml/training/data/
+!ml/training/data/.gitkeep
+ml/api/reports/
 kotlin-app/data/
 ml-api/reports/
 
 # Gradle
 kotlin-app/build/
 .gradle/
+build/
+
+# IDE/Gradle
+*.iml
+kapitol/
 
 # Логи
 *.log
