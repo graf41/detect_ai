@@ -17,6 +17,43 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "com.malaria.MainKt"
+
+        nativeDistributions {
+            targetFormats(
+                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
+                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg,
+                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb
+            )
+
+            packageName = "MalariaDetector"
+            packageVersion = "1.0.0"
+            description = "AI Malaria Detection Desktop Application"
+            vendor = "AI Medical Solutions"
+
+            // Настройки для Windows
+            windows {
+                menuGroup = "Medical Applications"
+                upgradeUuid = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+                // Можно добавить иконку
+                // iconFile.set(project.file("icon.ico"))
+            }
+
+            // Настройки для Mac
+            macOS {
+                bundleID = "com.malaria.detector"
+                dockName = "Malaria Detector"
+
+                // Можно добавить иконку
+                // iconFile.set(project.file("icon.icns"))
+            }
+
+            // Настройки для Linux
+            linux {
+                menuGroup = "Medical"
+                appCategory = "Science"
+            }
+        }
     }
 }
 

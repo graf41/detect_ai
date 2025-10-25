@@ -48,8 +48,8 @@ fun MainScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "AI Malaria Detection",
-            fontSize = 32.sp,
+            text = "AI Malaria Detection 🦠",
+            fontSize = 40.sp,
             color = Color.White
         )
 
@@ -61,7 +61,7 @@ fun MainScreen(
                 .fillMaxWidth(0.6f)
                 .height(60.dp)
         ) {
-            Text("Анализировать изображение", color = Color.Black)
+            Text("Анализировать изображение", color = Color.Green)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
