@@ -41,14 +41,19 @@ ENV/
 
 # Данные и модели
 ml/training/data/
-!ml/training/data/.gitkeep
 ml/api/reports/
 
-
-# Gradle
+# ВРЕМЕННЫЕ файлы
+desktop-app/build/
+desktop-app/.gradle/
 kotlin-app/build/
-.gradle/
-build/
+
+# НУЖНЫЕ файлы по gradle
+!desktop-app/gradle/
+!desktop-app/gradlew
+!desktop-app/gradlew.bat
+!desktop-app/build.gradle
+!desktop-app/settings.gradle
 
 # IDE/Gradle
 *.iml
@@ -58,9 +63,10 @@ kapitol/
 *.log
 logs/
 
-# Данные обучения
-ml/training/data/
-!ml/training/data/.gitkeep
-
-# Модели ML API
-ml/api/reports/
+# JAR и Java
+*.jar
+*.class
+jre/
+jdk/
+java/
+desktop-app/build/libs/
