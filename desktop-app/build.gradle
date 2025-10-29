@@ -1,6 +1,6 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
-    id 'org.jetbrains.compose' version '1.6.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.0'
+    id 'org.jetbrains.compose' version '1.5.11'
 }
 
 repositories {
@@ -9,9 +9,23 @@ repositories {
     google()
 }
 
+// Указываем кодировку для совместимости
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
 dependencies {
     implementation compose.desktop.currentOs
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.22'
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 compose.desktop {
@@ -20,37 +34,27 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(
-                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
                     org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg,
-                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb
+                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Exe,
+                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi
             )
 
-            packageName = "MalariaDetector"
+            packageName = "Malaria Detection"
             packageVersion = "1.0.0"
-
-            windows {
-                menuGroup = "Medical Applications"
-                upgradeUuid = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-            }
+            description = "AI-powered malaria detection application"
+            vendor = "Malaria Detection Team"
 
             macOS {
-                bundleID = "com.malaria.detector"
-                dockName = "Malaria Detector"
+                bundleID = "com.malaria.detection"
+                iconFile.set(project.file("src/main/resources/icon.icns"))
             }
 
-            linux {
-                menuGroup = "Medical"
-                appCategory = "Science"
+            windows {
+                menuGroup = "Malaria Detection"
+                upgradeUuid = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                perUserInstall = true
+                iconFile.set(project.file("src/main/resources/icon.ico"))
             }
         }
     }
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "17"
-}
-
-// Принудительная сборка всех форматов
-tasks.register('buildAll') {
-    dependsOn 'packageMsi', 'packageDmg', 'packageDeb'
 }

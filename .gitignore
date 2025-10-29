@@ -47,6 +47,7 @@ ml/api/reports/
 desktop-app/build/
 desktop-app/.gradle/
 kotlin-app/build/
+.gradle
 
 # JAR и Java
 *.jar
@@ -55,6 +56,9 @@ jre/
 jdk/
 java/
 desktop-app/build/libs/
+*.dmg
+*.msi
+*.exe
 
 # IDE/Gradle
 *.iml
@@ -63,3 +67,4 @@ kapitol/
 # Логи
 *.log
 logs/
+EOF
