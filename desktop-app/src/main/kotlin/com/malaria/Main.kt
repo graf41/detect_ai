@@ -61,7 +61,7 @@ fun MainScreen(
                 .fillMaxWidth(0.6f)
                 .height(60.dp)
         ) {
-            Text("Анализировать изображение", color = Color.Green)
+            Text("Анализировать изображение", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
