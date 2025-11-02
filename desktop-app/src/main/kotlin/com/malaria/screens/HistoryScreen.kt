@@ -44,7 +44,7 @@ fun HistoryScreen(onBackClick: () -> Unit) {
         ) {
             // Поле "Положительно"
             FilterCheckbox(
-                text = "Положительно",
+                text = "Положительный",
                 isSelected = selectedFilter == "positive",
                 onClick = {
                     selectedFilter = if (selectedFilter == "positive") null else "positive"
@@ -53,7 +53,7 @@ fun HistoryScreen(onBackClick: () -> Unit) {
 
             // Поле "Отрицательно"
             FilterCheckbox(
-                text = "Отрицательно",
+                text = "Отрицательный",
                 isSelected = selectedFilter == "negative",
                 onClick = {
                     selectedFilter = if (selectedFilter == "negative") null else "negative"
