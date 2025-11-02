@@ -26,7 +26,7 @@ fun MainScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "AI Malaria Detection 🦠",
+            text = "🩸 AI Malaria Detection 🦠",
             fontSize = 40.sp,
             color = Color.White
         )
