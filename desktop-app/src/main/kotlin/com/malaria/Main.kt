@@ -158,7 +158,59 @@ fun AboutScreen(onBackClick: () -> Unit) {
         Text(
             text = "О приложении",
             fontSize = 28.sp,
-            color = Color.White
+            color = Color.White,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // Раздел "Функционал"
+        Text(
+            text = "Функционал:",
+            fontSize = 20.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = "• Анализ изображений клеток крови на наличие малярии\n" +
+                    "• Использование искусственного интеллекта для диагностики\n" +
+                    "• Хранение истории предыдущих анализов\n" +
+                    "• Простой и интуитивно понятный интерфейс",
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Раздел "Авторы"
+        Text(
+            text = "Авторы:",
+            fontSize = 20.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = "Команда разработчиков AI Malaria Detection",
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Раздел "Версия приложения"
+        Text(
+            text = "Версия приложения:",
+            fontSize = 20.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = "1.0.0",
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Spacer(modifier = Modifier.weight(1f))
