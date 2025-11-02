@@ -30,7 +30,7 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
             onClick = { /* TODO */ },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Выбрать файл PNG", color = Color.Black)
+            Text("Загрузить файл PNG", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.weight(1f))
