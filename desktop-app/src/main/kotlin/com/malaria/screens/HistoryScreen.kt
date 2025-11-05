@@ -147,6 +147,7 @@ fun HistoryScreen(
     }
 }
 
+// DatePicker с циклическими месяцами
 @Composable
 fun DatePickerDialog(
     currentDate: String,
@@ -159,6 +160,7 @@ fun DatePickerDialog(
     var selectedMonth by remember { mutableStateOf(1) }
     var selectedYear by remember { mutableStateOf(2024) }
 
+    // Парсим минимальную дату если она есть
     val minDay = remember(minDate) {
         minDate?.split(".")?.get(0)?.toIntOrNull() ?: 1
     }
@@ -169,6 +171,7 @@ fun DatePickerDialog(
         minDate?.split(".")?.get(2)?.toIntOrNull() ?: 1900
     }
 
+    // Функция для проверки, можно ли уменьшить день
     fun canDecreaseDay(): Boolean {
         if (selectedYear > minYear) return true
         if (selectedYear == minYear && selectedMonth > minMonth) return true
@@ -176,6 +179,7 @@ fun DatePickerDialog(
         return false
     }
 
+    // Функция для получения количества дней в месяце
     fun getDaysInMonth(month: Int, year: Int): Int {
         return when (month) {
             1 -> 31
@@ -194,24 +198,56 @@ fun DatePickerDialog(
         }
     }
 
+    // Функция для проверки, можно ли увеличить день
     fun canIncreaseDay(): Boolean {
         return selectedDay < getDaysInMonth(selectedMonth, selectedYear)
     }
 
+    // Функция для проверки, можно ли уменьшить месяц
     fun canDecreaseMonth(): Boolean {
         if (selectedYear > minYear) return true
         if (selectedYear == minYear && selectedMonth > minMonth) return true
         return false
     }
 
+    // Функция для проверки, можно ли увеличить месяц
     fun canIncreaseMonth(): Boolean = true
 
+    // Функция для проверки, можно ли уменьшить год
     fun canDecreaseYear(): Boolean {
         return selectedYear > minYear
     }
 
+    // Функция для проверки, можно ли увеличить год
     fun canIncreaseYear(): Boolean = true
 
+    // Функция для циклического изменения месяца
+    fun changeMonth(delta: Int) {
+        var newMonth = selectedMonth + delta
+        var newYear = selectedYear
+
+        if (newMonth < 1) {
+            newMonth = 12
+            newYear--
+        } else if (newMonth > 12) {
+            newMonth = 1
+            newYear++
+        }
+
+        // Проверяем, что новая дата не меньше минимальной
+        if (newYear > minYear || (newYear == minYear && newMonth >= minMonth)) {
+            selectedMonth = newMonth
+            selectedYear = newYear
+
+            // Корректируем день если он выходит за пределы нового месяца
+            val maxDays = getDaysInMonth(selectedMonth, selectedYear)
+            if (selectedDay > maxDays) {
+                selectedDay = maxDays
+            }
+        }
+    }
+
+    // Парсим текущую дату при открытии
     LaunchedEffect(currentDate, minDate) {
         if (currentDate.isNotEmpty()) {
             val parts = currentDate.split(".")
@@ -221,6 +257,7 @@ fun DatePickerDialog(
                 selectedYear = parts[2].toIntOrNull() ?: 2024
             }
         } else if (minDate != null) {
+            // Если дата не выбрана, но есть минимальная дата, используем её
             val parts = minDate.split(".")
             if (parts.size == 3) {
                 selectedDay = parts[0].toIntOrNull() ?: 1
@@ -228,7 +265,7 @@ fun DatePickerDialog(
                 selectedYear = parts[2].toIntOrNull() ?: 2024
             }
         } else {
-
+            // Если дата не выбрана и нет минимальной, устанавливаем текущую дату
             val today = Calendar.getInstance()
             selectedDay = today.get(Calendar.DAY_OF_MONTH)
             selectedMonth = today.get(Calendar.MONTH) + 1
@@ -299,7 +336,7 @@ fun DatePickerDialog(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = { if (canDecreaseMonth()) selectedMonth-- },
+                    onClick = { if (canDecreaseMonth()) changeMonth(-1) },
                     modifier = Modifier.width(60.dp),
                     enabled = canDecreaseMonth()
                 ) {
@@ -330,7 +367,7 @@ fun DatePickerDialog(
                     textAlign = TextAlign.Center
                 )
                 Button(
-                    onClick = { if (canIncreaseMonth()) selectedMonth++ },
+                    onClick = { if (canIncreaseMonth()) changeMonth(1) },
                     modifier = Modifier.width(60.dp),
                     enabled = canIncreaseMonth()
                 ) {
