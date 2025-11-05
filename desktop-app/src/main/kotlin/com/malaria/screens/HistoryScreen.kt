@@ -34,7 +34,6 @@ fun HistoryScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // ВЫБОР ДАТЫ (НОВАЯ ФУНКЦИОНАЛЬНОСТЬ)
         Text(
             text = "Диапазон дат:",
             fontSize = 18.sp,
@@ -53,7 +52,6 @@ fun HistoryScreen(
                 fontSize = 16.sp
             )
 
-            // Кнопка выбора начальной даты
             Button(
                 onClick = onStartDateClick,
                 modifier = Modifier
@@ -69,7 +67,6 @@ fun HistoryScreen(
                 fontSize = 16.sp
             )
 
-            // Кнопка выбора конечной даты
             Button(
                 onClick = onEndDateClick,
                 modifier = Modifier
@@ -82,7 +79,6 @@ fun HistoryScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Кнопки фильтрации
         Text(
             text = "Фильтр по результатам:",
             fontSize = 18.sp,
@@ -133,6 +129,56 @@ fun HistoryScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Вернуться на главную", color = Color.Black)
+        }
+    }
+}
+
+// Базовый DatePicker диалог (простая заглушка)
+@Composable
+fun DatePickerDialog(
+    onDateSelected: (String) -> Unit,
+    onCancel: () -> Unit,
+    title: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .width(300.dp)
+                .background(Color.White)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+
+            Text(
+                text = "",
+                fontSize = 16.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(onClick = onCancel) {
+                    Text("Отмена")
+                }
+
+                Button(onClick = { onDateSelected("01.01.2024") }) {
+                    Text("Подтвердить")
+                }
+            }
         }
     }
 }
