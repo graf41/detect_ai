@@ -13,7 +13,11 @@ import androidx.compose.ui.unit.sp
 import com.malaria.components.FilterCheckbox
 
 @Composable
-fun HistoryScreen(onBackClick: () -> Unit) {
+fun HistoryScreen(
+    onBackClick: () -> Unit,
+    onStartDateClick: () -> Unit = {},
+    onEndDateClick: () -> Unit = {}
+) {
     var selectedFilter by remember { mutableStateOf<String?>(null) }
 
     Column(
@@ -30,6 +34,54 @@ fun HistoryScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // ВЫБОР ДАТЫ (НОВАЯ ФУНКЦИОНАЛЬНОСТЬ)
+        Text(
+            text = "Диапазон дат:",
+            fontSize = 18.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Искать от",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+
+            // Кнопка выбора начальной даты
+            Button(
+                onClick = onStartDateClick,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
+            ) {
+                Text("Выбрать", color = Color.Black, fontSize = 14.sp)
+            }
+
+            Text(
+                text = "до",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+
+            // Кнопка выбора конечной даты
+            Button(
+                onClick = onEndDateClick,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
+            ) {
+                Text("Выбрать", color = Color.Black, fontSize = 14.sp)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         // Кнопки фильтрации
         Text(
             text = "Фильтр по результатам:",
@@ -42,7 +94,6 @@ fun HistoryScreen(onBackClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            // Поле "Положительно"
             FilterCheckbox(
                 text = "Положительный",
                 isSelected = selectedFilter == "positive",
@@ -51,7 +102,6 @@ fun HistoryScreen(onBackClick: () -> Unit) {
                 }
             )
 
-            // Поле "Отрицательно"
             FilterCheckbox(
                 text = "Отрицательный",
                 isSelected = selectedFilter == "negative",
@@ -63,7 +113,6 @@ fun HistoryScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Текст с информацией о выбранном фильтре
         Text(
             text = if (selectedFilter == null) {
                 "Все анализы"
