@@ -22,7 +22,11 @@ fun main() = application {
                 onAboutClick = { currentScreen = "about" }
             )
             "analyze" -> AnalyzeScreen(onBackClick = { currentScreen = "main" })
-            "history" -> HistoryScreen(onBackClick = { currentScreen = "main" })
+            "history" -> HistoryScreen(
+                onBackClick = { currentScreen = "main" },
+                onStartDateClick = { /* TODO: добавить функционал */ },
+                onEndDateClick = { /* TODO: добавить функционал */ }
+            )
             "about" -> AboutScreen(onBackClick = { currentScreen = "main" })
         }
     }
