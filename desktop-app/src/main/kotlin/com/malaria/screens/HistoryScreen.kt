@@ -147,7 +147,7 @@ fun HistoryScreen(
     }
 }
 
-// DatePicker с улучшенным UI
+// DatePicker с исправленной логикой дня (минимум 1)
 @Composable
 fun DatePickerDialog(
     currentDate: String,
@@ -171,12 +171,9 @@ fun DatePickerDialog(
         minDate?.split(".")?.get(2)?.toIntOrNull() ?: 1900
     }
 
-    // Функция для проверки, можно ли уменьшить день
+    // Функция для проверки, можно ли уменьшить день (нельзя меньше 1)
     fun canDecreaseDay(): Boolean {
-        if (selectedYear > minYear) return true
-        if (selectedYear == minYear && selectedMonth > minMonth) return true
-        if (selectedYear == minYear && selectedMonth == minMonth && selectedDay > minDay) return true
-        return false
+        return selectedDay > 1
     }
 
     // Функция для получения количества дней в месяце
@@ -198,7 +195,7 @@ fun DatePickerDialog(
         }
     }
 
-    // Функция для проверки, можно ли увеличить день
+    // Функция для проверки, можно ли увеличить день (нельзя больше дней в месяце)
     fun canIncreaseDay(): Boolean {
         return selectedDay < getDaysInMonth(selectedMonth, selectedYear)
     }
@@ -282,7 +279,7 @@ fun DatePickerDialog(
     ) {
         Column(
             modifier = Modifier
-                .width(350.dp) // Увеличиваем ширину
+                .width(350.dp)
                 .background(Color.White)
                 .padding(24.dp)
                 .clickable { /* Не закрывать при клике внутри */ },
