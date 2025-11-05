@@ -8,9 +8,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malaria.components.FilterCheckbox
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun HistoryScreen(
@@ -133,13 +136,16 @@ fun HistoryScreen(
     }
 }
 
-// Базовый DatePicker диалог (простая заглушка)
 @Composable
 fun DatePickerDialog(
     onDateSelected: (String) -> Unit,
     onCancel: () -> Unit,
     title: String
 ) {
+    var selectedDay by remember { mutableStateOf(1) }
+    var selectedMonth by remember { mutableStateOf(1) }
+    var selectedYear by remember { mutableStateOf(2024) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -160,12 +166,82 @@ fun DatePickerDialog(
                 modifier = Modifier.padding(bottom = 20.dp)
             )
 
+            // Выбор дня
+            Text("День:", color = Color.Black, fontSize = 16.sp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = { if (selectedDay > 1) selectedDay-- }) {
+                    Text("<")
+                }
+                Text("$selectedDay", fontSize = 18.sp, color = Color.Black)
+                Button(onClick = { if (selectedDay < 31) selectedDay++ }) {
+                    Text(">")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Выбор месяца
+            Text("Месяц:", color = Color.Black, fontSize = 16.sp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = { if (selectedMonth > 1) selectedMonth-- }) {
+                    Text("<")
+                }
+                Text(
+                    text = when (selectedMonth) {
+                        1 -> "Январь"
+                        2 -> "Февраль"
+                        3 -> "Март"
+                        4 -> "Апрель"
+                        5 -> "Май"
+                        6 -> "Июнь"
+                        7 -> "Июль"
+                        8 -> "Август"
+                        9 -> "Сентябрь"
+                        10 -> "Октябрь"
+                        11 -> "Ноябрь"
+                        12 -> "Декабрь"
+                        else -> "Январь"
+                    },
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+                Button(onClick = { if (selectedMonth < 12) selectedMonth++ }) {
+                    Text(">")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Выбор года
+            Text("Год:", color = Color.Black, fontSize = 16.sp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = { selectedYear-- }) {
+                    Text("<")
+                }
+                Text("$selectedYear", fontSize = 18.sp, color = Color.Black)
+                Button(onClick = { selectedYear++ }) {
+                    Text(">")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Text(
-                text = "",
+                text = "Выбрано: ${String.format("%02d", selectedDay)}.${String.format("%02d", selectedMonth)}.$selectedYear",
                 fontSize = 16.sp,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 20.dp)
+                color = Color.Black
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -175,7 +251,10 @@ fun DatePickerDialog(
                     Text("Отмена")
                 }
 
-                Button(onClick = { onDateSelected("01.01.2024") }) {
+                Button(onClick = {
+                    val newDate = "${String.format("%02d", selectedDay)}.${String.format("%02d", selectedMonth)}.$selectedYear"
+                    onDateSelected(newDate)
+                }) {
                     Text("Подтвердить")
                 }
             }
