@@ -1,6 +1,7 @@
 package com.malaria.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -19,7 +20,9 @@ import java.util.*
 fun HistoryScreen(
     onBackClick: () -> Unit,
     onStartDateClick: () -> Unit = {},
-    onEndDateClick: () -> Unit = {}
+    onEndDateClick: () -> Unit = {},
+    startDate: String = "",
+    endDate: String = ""
 ) {
     var selectedFilter by remember { mutableStateOf<String?>(null) }
 
@@ -61,7 +64,11 @@ fun HistoryScreen(
                     .weight(1f)
                     .padding(horizontal = 8.dp)
             ) {
-                Text("Выбрать", color = Color.Black, fontSize = 14.sp)
+                Text(
+                    text = if (startDate.isEmpty()) "Выбрать" else startDate,
+                    color = Color.Black,
+                    fontSize = 14.sp
+                )
             }
 
             Text(
@@ -76,7 +83,11 @@ fun HistoryScreen(
                     .weight(1f)
                     .padding(horizontal = 8.dp)
             ) {
-                Text("Выбрать", color = Color.Black, fontSize = 14.sp)
+                Text(
+                    text = if (endDate.isEmpty()) "Выбрать" else endDate,
+                    color = Color.Black,
+                    fontSize = 14.sp
+                )
             }
         }
 
@@ -114,11 +125,11 @@ fun HistoryScreen(
 
         Text(
             text = if (selectedFilter == null) {
-                "Все анализы"
+                "Все анализы с ${if (startDate.isEmpty()) "..." else startDate} по ${if (endDate.isEmpty()) "..." else endDate}"
             } else if (selectedFilter == "positive") {
-                "Показаны анализы с положительным результатом"
+                "Положительные анализы с ${if (startDate.isEmpty()) "..." else startDate} по ${if (endDate.isEmpty()) "..." else endDate}"
             } else {
-                "Показаны анализы с отрицательным результатом"
+                "Отрицательные анализы с ${if (startDate.isEmpty()) "..." else startDate} по ${if (endDate.isEmpty()) "..." else endDate}"
             },
             fontSize = 16.sp,
             color = Color.White,
@@ -138,25 +149,106 @@ fun HistoryScreen(
 
 @Composable
 fun DatePickerDialog(
+    currentDate: String,
     onDateSelected: (String) -> Unit,
     onCancel: () -> Unit,
-    title: String
+    title: String,
+    minDate: String? = null
 ) {
     var selectedDay by remember { mutableStateOf(1) }
     var selectedMonth by remember { mutableStateOf(1) }
     var selectedYear by remember { mutableStateOf(2024) }
 
+    val minDay = remember(minDate) {
+        minDate?.split(".")?.get(0)?.toIntOrNull() ?: 1
+    }
+    val minMonth = remember(minDate) {
+        minDate?.split(".")?.get(1)?.toIntOrNull() ?: 1
+    }
+    val minYear = remember(minDate) {
+        minDate?.split(".")?.get(2)?.toIntOrNull() ?: 1900
+    }
+
+    fun canDecreaseDay(): Boolean {
+        if (selectedYear > minYear) return true
+        if (selectedYear == minYear && selectedMonth > minMonth) return true
+        if (selectedYear == minYear && selectedMonth == minMonth && selectedDay > minDay) return true
+        return false
+    }
+
+    fun getDaysInMonth(month: Int, year: Int): Int {
+        return when (month) {
+            1 -> 31
+            2 -> if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) 29 else 28
+            3 -> 31
+            4 -> 30
+            5 -> 31
+            6 -> 30
+            7 -> 31
+            8 -> 31
+            9 -> 30
+            10 -> 31
+            11 -> 30
+            12 -> 31
+            else -> 31
+        }
+    }
+
+    fun canIncreaseDay(): Boolean {
+        return selectedDay < getDaysInMonth(selectedMonth, selectedYear)
+    }
+
+    fun canDecreaseMonth(): Boolean {
+        if (selectedYear > minYear) return true
+        if (selectedYear == minYear && selectedMonth > minMonth) return true
+        return false
+    }
+
+    fun canIncreaseMonth(): Boolean = true
+
+    fun canDecreaseYear(): Boolean {
+        return selectedYear > minYear
+    }
+
+    fun canIncreaseYear(): Boolean = true
+
+    LaunchedEffect(currentDate, minDate) {
+        if (currentDate.isNotEmpty()) {
+            val parts = currentDate.split(".")
+            if (parts.size == 3) {
+                selectedDay = parts[0].toIntOrNull() ?: 1
+                selectedMonth = parts[1].toIntOrNull() ?: 1
+                selectedYear = parts[2].toIntOrNull() ?: 2024
+            }
+        } else if (minDate != null) {
+            val parts = minDate.split(".")
+            if (parts.size == 3) {
+                selectedDay = parts[0].toIntOrNull() ?: 1
+                selectedMonth = parts[1].toIntOrNull() ?: 1
+                selectedYear = parts[2].toIntOrNull() ?: 2024
+            }
+        } else {
+
+            val today = Calendar.getInstance()
+            selectedDay = today.get(Calendar.DAY_OF_MONTH)
+            selectedMonth = today.get(Calendar.MONTH) + 1
+            selectedYear = today.get(Calendar.YEAR)
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f)),
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable { onCancel() },
         contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
                 .width(300.dp)
                 .background(Color.White)
-                .padding(24.dp),
+                .padding(24.dp)
+                .clickable { /* Не закрывать при клике внутри */ },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -172,11 +264,28 @@ fun DatePickerDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { if (selectedDay > 1) selectedDay-- }) {
+                Button(
+                    onClick = { if (canDecreaseDay()) selectedDay-- },
+                    modifier = Modifier.width(60.dp),
+                    enabled = canDecreaseDay()
+                ) {
                     Text("<")
                 }
-                Text("$selectedDay", fontSize = 18.sp, color = Color.Black)
-                Button(onClick = { if (selectedDay < 31) selectedDay++ }) {
+                Text(
+                    text = "$selectedDay",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    modifier = Modifier
+                        .width(80.dp)
+                        .background(Color.LightGray)
+                        .padding(8.dp),
+                    textAlign = TextAlign.Center
+                )
+                Button(
+                    onClick = { if (canIncreaseDay()) selectedDay++ },
+                    modifier = Modifier.width(60.dp),
+                    enabled = canIncreaseDay()
+                ) {
                     Text(">")
                 }
             }
@@ -189,7 +298,11 @@ fun DatePickerDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { if (selectedMonth > 1) selectedMonth-- }) {
+                Button(
+                    onClick = { if (canDecreaseMonth()) selectedMonth-- },
+                    modifier = Modifier.width(60.dp),
+                    enabled = canDecreaseMonth()
+                ) {
                     Text("<")
                 }
                 Text(
@@ -209,9 +322,18 @@ fun DatePickerDialog(
                         else -> "Январь"
                     },
                     fontSize = 16.sp,
-                    color = Color.Black
+                    color = Color.Black,
+                    modifier = Modifier
+                        .width(120.dp)
+                        .background(Color.LightGray)
+                        .padding(8.dp),
+                    textAlign = TextAlign.Center
                 )
-                Button(onClick = { if (selectedMonth < 12) selectedMonth++ }) {
+                Button(
+                    onClick = { if (canIncreaseMonth()) selectedMonth++ },
+                    modifier = Modifier.width(60.dp),
+                    enabled = canIncreaseMonth()
+                ) {
                     Text(">")
                 }
             }
@@ -224,11 +346,28 @@ fun DatePickerDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { selectedYear-- }) {
+                Button(
+                    onClick = { if (canDecreaseYear()) selectedYear-- },
+                    modifier = Modifier.width(60.dp),
+                    enabled = canDecreaseYear()
+                ) {
                     Text("<")
                 }
-                Text("$selectedYear", fontSize = 18.sp, color = Color.Black)
-                Button(onClick = { selectedYear++ }) {
+                Text(
+                    text = "$selectedYear",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    modifier = Modifier
+                        .width(80.dp)
+                        .background(Color.LightGray)
+                        .padding(8.dp),
+                    textAlign = TextAlign.Center
+                )
+                Button(
+                    onClick = { if (canIncreaseYear()) selectedYear++ },
+                    modifier = Modifier.width(60.dp),
+                    enabled = canIncreaseYear()
+                ) {
                     Text(">")
                 }
             }
@@ -238,24 +377,29 @@ fun DatePickerDialog(
             Text(
                 text = "Выбрано: ${String.format("%02d", selectedDay)}.${String.format("%02d", selectedMonth)}.$selectedYear",
                 fontSize = 16.sp,
-                color = Color.Black
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 20.dp)
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = onCancel) {
-                    Text("Отмена")
+                Button(
+                    onClick = onCancel,
+                    modifier = Modifier.width(140.dp)
+                ) {
+                    Text("Отмена", fontSize = 14.sp)
                 }
 
-                Button(onClick = {
-                    val newDate = "${String.format("%02d", selectedDay)}.${String.format("%02d", selectedMonth)}.$selectedYear"
-                    onDateSelected(newDate)
-                }) {
-                    Text("Подтвердить")
+                Button(
+                    onClick = {
+                        val newDate = "${String.format("%02d", selectedDay)}.${String.format("%02d", selectedMonth)}.$selectedYear"
+                        onDateSelected(newDate)
+                    },
+                    modifier = Modifier.width(140.dp)
+                ) {
+                    Text("Подтвердить", fontSize = 14.sp)
                 }
             }
         }

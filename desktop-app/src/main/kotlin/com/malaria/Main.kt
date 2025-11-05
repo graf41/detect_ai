@@ -13,6 +13,8 @@ fun main() = application {
     var currentScreen by remember { mutableStateOf("main") }
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
+    var startDate by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf("") }
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -28,14 +30,18 @@ fun main() = application {
             "history" -> HistoryScreen(
                 onBackClick = { currentScreen = "main" },
                 onStartDateClick = { showStartDatePicker = true },
-                onEndDateClick = { showEndDatePicker = true }
+                onEndDateClick = { showEndDatePicker = true },
+                startDate = startDate,
+                endDate = endDate
             )
             "about" -> AboutScreen(onBackClick = { currentScreen = "main" })
         }
 
         if (showStartDatePicker) {
             DatePickerDialog(
-                onDateSelected = {
+                currentDate = startDate,
+                onDateSelected = { newDate ->
+                    startDate = newDate
                     showStartDatePicker = false
                 },
                 onCancel = { showStartDatePicker = false },
@@ -45,11 +51,14 @@ fun main() = application {
 
         if (showEndDatePicker) {
             DatePickerDialog(
-                onDateSelected = {
+                currentDate = endDate,
+                onDateSelected = { newDate ->
+                    endDate = newDate
                     showEndDatePicker = false
                 },
                 onCancel = { showEndDatePicker = false },
-                title = "Выбор конечной даты"
+                title = "Выбор конечной даты",
+                minDate = startDate
             )
         }
     }
