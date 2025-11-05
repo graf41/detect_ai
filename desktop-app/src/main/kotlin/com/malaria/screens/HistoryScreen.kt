@@ -147,7 +147,7 @@ fun HistoryScreen(
     }
 }
 
-// DatePicker с циклическими месяцами
+// DatePicker с улучшенным UI
 @Composable
 fun DatePickerDialog(
     currentDate: String,
@@ -282,7 +282,7 @@ fun DatePickerDialog(
     ) {
         Column(
             modifier = Modifier
-                .width(300.dp)
+                .width(350.dp) // Увеличиваем ширину
                 .background(Color.White)
                 .padding(24.dp)
                 .clickable { /* Не закрывать при клике внутри */ },
@@ -296,21 +296,22 @@ fun DatePickerDialog(
             )
 
             // Выбор дня
-            Text("День:", color = Color.Black, fontSize = 16.sp)
+            Text("День:", color = Color.Black, fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
                     onClick = { if (canDecreaseDay()) selectedDay-- },
                     modifier = Modifier.width(60.dp),
                     enabled = canDecreaseDay()
                 ) {
-                    Text("<")
+                    Text("◀")
                 }
                 Text(
                     text = "$selectedDay",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     color = Color.Black,
                     modifier = Modifier
                         .width(80.dp)
@@ -323,24 +324,25 @@ fun DatePickerDialog(
                     modifier = Modifier.width(60.dp),
                     enabled = canIncreaseDay()
                 ) {
-                    Text(">")
+                    Text("▶")
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Выбор месяца
-            Text("Месяц:", color = Color.Black, fontSize = 16.sp)
+            Text("Месяц:", color = Color.Black, fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
                     onClick = { if (canDecreaseMonth()) changeMonth(-1) },
                     modifier = Modifier.width(60.dp),
                     enabled = canDecreaseMonth()
                 ) {
-                    Text("<")
+                    Text("◀")
                 }
                 Text(
                     text = when (selectedMonth) {
@@ -371,28 +373,29 @@ fun DatePickerDialog(
                     modifier = Modifier.width(60.dp),
                     enabled = canIncreaseMonth()
                 ) {
-                    Text(">")
+                    Text("▶")
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Выбор года
-            Text("Год:", color = Color.Black, fontSize = 16.sp)
+            Text("Год:", color = Color.Black, fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
                     onClick = { if (canDecreaseYear()) selectedYear-- },
                     modifier = Modifier.width(60.dp),
                     enabled = canDecreaseYear()
                 ) {
-                    Text("<")
+                    Text("◀")
                 }
                 Text(
                     text = "$selectedYear",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     color = Color.Black,
                     modifier = Modifier
                         .width(80.dp)
@@ -405,7 +408,7 @@ fun DatePickerDialog(
                     modifier = Modifier.width(60.dp),
                     enabled = canIncreaseYear()
                 ) {
-                    Text(">")
+                    Text("▶")
                 }
             }
 
@@ -413,7 +416,7 @@ fun DatePickerDialog(
 
             Text(
                 text = "Выбрано: ${String.format("%02d", selectedDay)}.${String.format("%02d", selectedMonth)}.$selectedYear",
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 color = Color.Black,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
