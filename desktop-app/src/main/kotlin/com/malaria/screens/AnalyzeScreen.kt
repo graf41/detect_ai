@@ -30,6 +30,7 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Кнопка загрузки файла
         Button(
             onClick = {
                 openFileDialog { filePath ->
@@ -43,18 +44,20 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Отображение выбранного файла с кнопкой удаления
         if (selectedFile != null) {
-            Text(
-                text = "Выбран файл: ${getFileName(selectedFile!!)}",
-                fontSize = 14.sp,
-                color = Color.White,
-                modifier = Modifier.padding(vertical = 8.dp)
+            FileItem(
+                filePath = selectedFile!!,
+                onRemove = { selectedFile = null }
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Кнопка анализа (активна только когда файл выбран)
         Button(
             onClick = {
+                // TODO: Добавить логику анализа изображения
                 println("Анализируем файл: $selectedFile")
             },
             modifier = Modifier.fillMaxWidth(),
@@ -74,10 +77,45 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
     }
 }
 
+// Компонент для отображения файла с кнопкой удаления
+@Composable
+fun FileItem(filePath: String, onRemove: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF7A7A7A))
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Выбранный файл:",
+                fontSize = 14.sp,
+                color = Color.White
+            )
+            Text(
+                text = getFileName(filePath),
+                fontSize = 12.sp,
+                color = Color.LightGray,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
+        Button(
+            onClick = onRemove,
+            modifier = Modifier.height(36.dp)
+        ) {
+            Text("✕", color = Color.Black, fontSize = 14.sp)
+        }
+    }
+}
+
+// Функция для получения имени файла из полного пути
 private fun getFileName(filePath: String): String {
     return filePath.substringAfterLast("\\").substringAfterLast("/")
 }
 
+// Функция для открытия диалога выбора файла
 private fun openFileDialog(onFileSelected: (String) -> Unit) {
     val fileDialog = FileDialog(null as Frame?, "Выберите изображение")
     fileDialog.mode = FileDialog.LOAD
