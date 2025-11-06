@@ -26,11 +26,23 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Кнопка загрузки файла (пока без функционала)
         Button(
-            onClick = { /* TODO */ },
+            onClick = { /* TODO: добавить функционал загрузки */ },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Загрузить файл PNG", color = Color.Black)
+            Text("Загрузить изображение", color = Color.Black)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Кнопка анализа (пока без функционала)
+        Button(
+            onClick = { /* TODO: добавить функционал анализа */ },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = false // Пока неактивна
+        ) {
+            Text("Проанализировать изображение", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.weight(1f))
