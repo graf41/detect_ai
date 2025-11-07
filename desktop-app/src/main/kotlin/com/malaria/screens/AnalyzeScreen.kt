@@ -15,6 +15,7 @@ import java.awt.Frame
 @Composable
 fun AnalyzeScreen(onBackClick: () -> Unit) {
     var selectedFile by remember { mutableStateOf<String?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -30,11 +31,15 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Кнопка загрузки файла
         Button(
             onClick = {
+                errorMessage = null
                 openFileDialog { filePath ->
-                    selectedFile = filePath
+                    if (isSupportedFormat(filePath)) {
+                        selectedFile = filePath
+                    } else {
+                        errorMessage = "Неподдерживаемый формат файла. Используйте PNG или JPEG."
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -44,21 +49,28 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Отображение выбранного файла с кнопкой удаления
+        if (errorMessage != null) {
+            ErrorMessage(
+                message = errorMessage!!,
+                onDismiss = { errorMessage = null }
+            )
+        }
+
         if (selectedFile != null) {
             FileItem(
                 filePath = selectedFile!!,
-                onRemove = { selectedFile = null }
+                onRemove = {
+                    selectedFile = null
+                    errorMessage = null
+                }
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Кнопка анализа (активна только когда файл выбран)
         Button(
             onClick = {
-                // TODO: Добавить логику анализа изображения
-                println("Анализируем файл: $selectedFile")
+               println("Анализируем файл: $selectedFile")
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = selectedFile != null
@@ -77,7 +89,43 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
     }
 }
 
-// Компонент для отображения файла с кнопкой удаления
+@Composable
+fun ErrorMessage(message: String, onDismiss: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFD32F2F)) // Красный фон для ошибки
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Ошибка:",
+                fontSize = 14.sp,
+                color = Color.White
+            )
+            Text(
+                text = message,
+                fontSize = 12.sp,
+                color = Color.White,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
+        Button(
+            onClick = onDismiss,
+            modifier = Modifier.height(36.dp),
+            colors = androidx.compose.material.ButtonDefaults.buttonColors(
+                backgroundColor = Color.White
+            )
+        ) {
+            Text("✕", color = Color.Red, fontSize = 14.sp)
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+}
+
 @Composable
 fun FileItem(filePath: String, onRemove: () -> Unit) {
     Row(
@@ -99,6 +147,12 @@ fun FileItem(filePath: String, onRemove: () -> Unit) {
                 color = Color.LightGray,
                 modifier = Modifier.padding(top = 4.dp)
             )
+            Text(
+                text = "Формат: ${getFileExtension(filePath).uppercase()}",
+                fontSize = 10.sp,
+                color = Color(0xFF4CAF50), // Зеленый цвет для правильного формата
+                modifier = Modifier.padding(top = 2.dp)
+            )
         }
 
         Button(
@@ -110,24 +164,25 @@ fun FileItem(filePath: String, onRemove: () -> Unit) {
     }
 }
 
-// Функция для получения имени файла из полного пути
 private fun getFileName(filePath: String): String {
     return filePath.substringAfterLast("\\").substringAfterLast("/")
 }
 
-// Функция для открытия диалога выбора файла
+
+private fun getFileExtension(filePath: String): String {
+    return filePath.substringAfterLast(".", "").lowercase()
+}
+
+
+private fun isSupportedFormat(filePath: String): Boolean {
+    val extension = getFileExtension(filePath)
+    return extension == "png" || extension == "jpg" || extension == "jpeg"
+}
+
 private fun openFileDialog(onFileSelected: (String) -> Unit) {
-    val fileDialog = FileDialog(null as Frame?, "Выберите изображение")
+    val fileDialog = FileDialog(null as Frame?, "Выберите изображение (PNG, JPEG)")
     fileDialog.mode = FileDialog.LOAD
     fileDialog.isMultipleMode = false
-
-    // Устанавливаем фильтр для изображений
-    fileDialog.setFilenameFilter { dir, name ->
-        name.endsWith(".png", ignoreCase = true) ||
-                name.endsWith(".jpg", ignoreCase = true) ||
-                name.endsWith(".jpeg", ignoreCase = true) ||
-                name.endsWith(".bmp", ignoreCase = true)
-    }
 
     fileDialog.isVisible = true
 
