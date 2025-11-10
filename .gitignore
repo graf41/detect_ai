@@ -38,6 +38,7 @@ ENV/
 .idea/
 *.swp
 *.swo
+.gigaide
 
 # Данные и модели
 ml/training/data/
