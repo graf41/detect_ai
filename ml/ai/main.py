@@ -61,9 +61,9 @@ torch.backends.cudnn.benchmark = True
 
 SEED = 42
 random.seed(SEED); np.random.seed(SEED); torch.manual_seed(SEED)
-DATA_DIR = Path("../training/data")
-REPORTS  = REPORTS = Path("../ml-api/reports"); REPORTS.mkdir(exist_ok=True)
-IMG_SIZE, BATCH, LR = 224, 16, 3e-4
+DATA_DIR = Path("../../ml/training/data/train")
+REPORTS  = REPORTS = Path("../training"); REPORTS.mkdir(exist_ok=True)
+IMG_SIZE, BATCH, LR = 224, 8, 3e-4
 PATIENCE, EPS       = 2,   1e-4
 
 train_tfms = transforms.Compose([
@@ -81,7 +81,18 @@ if not DATA_DIR.exists():
     raise FileNotFoundError(f"Dataset folder not found: {DATA_DIR}")
 full_ds = datasets.ImageFolder(root=DATA_DIR)
 labels  = np.array(full_ds.targets)
-print(f"Всего изображений: {len(full_ds)} | Классы: {full_ds.classes}")
+# === ДИАГНОСТИКА ДАННЫХ ===
+print("=== ДИАГНОСТИКА ДАННЫХ ===")
+print("Размер датасета:", len(full_ds))
+print("Классы:", full_ds.classes)
+print("Распределение по классам:", np.bincount(labels))
+print("Соотношение классов:", np.bincount(labels) / len(labels))
+
+# Проверь первые несколько изображений
+for i in range(3):
+    img, label = full_ds[i]
+    print(f"Изображение {i}: класс {full_ds.classes[label]}, размер {img.size}")
+# === КОНЕЦ ДИАГНОСТИКИ ===
 
 num_workers = args.workers
 pin_memory   = True
@@ -97,7 +108,7 @@ def make_loader(idxs: List[int], train: bool) -> DataLoader:
 
 def build_model() -> nn.Module:
     model = models.efficientnet_b0(weights=models.EfficientNet_B0_Weights.DEFAULT)
-    for p in model.features.parameters(): p.requires_grad = False
+   # for p in model.features.parameters(): p.requires_grad = False
     model.classifier = nn.Sequential(
         nn.Dropout(0.3),
         nn.Linear(model.classifier[1].in_features, 2)
