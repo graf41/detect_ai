@@ -1,20 +1,20 @@
 package com.malaria
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.malaria.screens.MainScreen
+import com.malaria.screens.AnalyzeScreen
+import com.malaria.screens.HistoryScreen
+import com.malaria.screens.AboutScreen
+import com.malaria.screens.DatePickerDialog
 
 fun main() = application {
     var currentScreen by remember { mutableStateOf("main") }
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
+    var startDate by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf("") }
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -27,147 +27,39 @@ fun main() = application {
                 onAboutClick = { currentScreen = "about" }
             )
             "analyze" -> AnalyzeScreen(onBackClick = { currentScreen = "main" })
-            "history" -> HistoryScreen(onBackClick = { currentScreen = "main" })
+            "history" -> HistoryScreen(
+                onBackClick = { currentScreen = "main" },
+                onStartDateClick = { showStartDatePicker = true },
+                onEndDateClick = { showEndDatePicker = true },
+                startDate = startDate,
+                endDate = endDate
+            )
             "about" -> AboutScreen(onBackClick = { currentScreen = "main" })
         }
-    }
-}
 
-@Composable
-fun MainScreen(
-    onAnalyzeClick: () -> Unit,
-    onHistoryClick: () -> Unit,
-    onAboutClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF929292))
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "AI Malaria Detection 🦠",
-            fontSize = 40.sp,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Button(
-            onClick = onAnalyzeClick,
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .height(60.dp)
-        ) {
-            Text("Анализировать изображение", color = Color.Green)
+        if (showStartDatePicker) {
+            DatePickerDialog(
+                currentDate = startDate,
+                onDateSelected = { newDate ->
+                    startDate = newDate
+                    showStartDatePicker = false
+                },
+                onCancel = { showStartDatePicker = false },
+                title = "Выбор начальной даты"
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = onHistoryClick,
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .height(60.dp)
-        ) {
-            Text("История анализов", color = Color.Black)
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = onAboutClick,
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .height(60.dp)
-        ) {
-            Text("О приложении", color = Color.Black)
-        }
-    }
-}
-
-@Composable
-fun AnalyzeScreen(onBackClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF929292))
-            .padding(32.dp)
-    ) {
-        Text(
-            text = "Анализ изображения",
-            fontSize = 28.sp,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = { /* TODO */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Выбрать файл PNG", color = Color.Black)
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onBackClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Вернуться на главную", color = Color.Black)
-        }
-    }
-}
-
-@Composable
-fun HistoryScreen(onBackClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF929292))
-            .padding(32.dp)
-    ) {
-        Text(
-            text = "История анализов",
-            fontSize = 28.sp,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onBackClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Вернуться на главную", color = Color.Black)
-        }
-    }
-}
-
-@Composable
-fun AboutScreen(onBackClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF929292))
-            .padding(32.dp)
-    ) {
-        Text(
-            text = "О приложении",
-            fontSize = 28.sp,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onBackClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Вернуться на главную", color = Color.Black)
+        if (showEndDatePicker) {
+            DatePickerDialog(
+                currentDate = endDate,
+                onDateSelected = { newDate ->
+                    endDate = newDate
+                    showEndDatePicker = false
+                },
+                onCancel = { showEndDatePicker = false },
+                title = "Выбор конечной даты",
+                minDate = startDate
+            )
         }
     }
 }
