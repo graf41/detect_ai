@@ -53,7 +53,6 @@ compose.desktop {
             description = "AI-powered malaria detection application"
             vendor = "Malaria Detection Team"
 
-            modules('java.net.http', 'jdk.httpserver')
 
             macOS {
                 bundleID = "com.malaria.detection"

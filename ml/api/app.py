@@ -65,21 +65,23 @@ def predict(image_data: bytes) -> dict:
     try:
         start_time = time.time()
 
-        # обработка пикчи
+        # обработка изображения
         image = Image.open(io.BytesIO(image_data)).convert('RGB')
         image_tensor = val_tfms(image).unsqueeze(0).to(device)
 
         with torch.no_grad():
             output = model(image_tensor)
-            probability = torch.softmax(output, dim=1)[0][0].item()
+            probs = torch.softmax(output, dim=1)
+            predicted_class = output.argmax(1)[0]
+            confidence = probs[0][predicted_class].item()
 
         processing_time = time.time() - start_time
 
-        diagnosis = "parasitized" if probability > 0.5 else "uninfected"
+        diagnosis = "parasitized" if predicted_class == 0 else "uninfected"
 
         return {
             "diagnosis": diagnosis,
-            "confidence": probability,
+            "confidence": confidence,
             "processing_time": round(processing_time, 2),
             "model_used": "EfficientNet-B0"
         }

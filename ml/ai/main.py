@@ -179,8 +179,13 @@ if args.folds > 0:
         probs, preds, truths = [], [], []
         with torch.no_grad():
             for x, y in vl_loader:
-                out = net(x.to(device)); p = torch.softmax(out,1)[:,1]
-                probs.extend(p.cpu().numpy()); preds.extend(out.argmax(1).cpu().numpy()); truths.extend(y.numpy())
+                out = net(x.to(device))
+                probs_tensor = torch.softmax(out, 1)
+                predicted_class = out.argmax(1)
+                p = probs_tensor[torch.arange(len(probs_tensor)), predicted_class]
+                probs.extend(p.cpu().numpy());
+                preds.extend(predicted_class.cpu().numpy());
+                truths.extend(y.numpy())
         cv_results.append(compute_metrics(np.array(truths), np.array(probs), np.array(preds)))
     pd.DataFrame(cv_results).to_csv(REPORTS/'cv_metrics.csv', index=False)
     print("CV metrics saved.")
@@ -226,7 +231,10 @@ model.eval()
 probs_tr, preds_tr, truths_tr = [], [], []
 with torch.no_grad():
     for x, y in train_loader:
-        out = model(x.to(device)); p = torch.softmax(out,1)[:,1]
+        out = model(x.to(device))
+        probs_tensor = torch.softmax(out, 1)
+        predicted_class = out.argmax(1)
+        p = probs_tensor[torch.arange(len(probs_tensor)), predicted_class]
         probs_tr.extend(p.cpu().numpy()); preds_tr.extend(out.argmax(1).cpu().numpy()); truths_tr.extend(y.numpy())
 train_metrics = compute_metrics(np.array(truths_tr), np.array(probs_tr), np.array(preds_tr))
 pd.DataFrame([train_metrics]).to_csv(REPORTS/'train_metrics.csv', index=False)
@@ -236,7 +244,10 @@ model.eval()
 probs_te, preds_te, truths_te = [], [], []
 with torch.no_grad():
     for x, y in test_loader:
-        out = model(x.to(device)); p = torch.softmax(out,1)[:,1]
+        out = model(x.to(device))
+        probs_tensor = torch.softmax(out, 1)
+        predicted_class = out.argmax(1)
+        p = probs_tensor[torch.arange(len(probs_tensor)), predicted_class]
         probs_te.extend(p.cpu().numpy()); preds_te.extend(out.argmax(1).cpu().numpy()); truths_te.extend(y.numpy())
 test_metrics = compute_metrics(np.array(truths_te), np.array(probs_te), np.array(preds_te))
 pd.DataFrame([test_metrics]).to_csv(REPORTS/'test_metrics.csv', index=False)
