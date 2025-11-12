@@ -39,7 +39,10 @@ object MalariaApiClient {
             val response = withContext(Dispatchers.IO) {
                 client.send(request, HttpResponse.BodyHandlers.ofString())
             }
-
+            println("=== RAW RESPONSE ===")
+            println("Status: ${response.statusCode()}")
+            println("Body: ${response.body()}")
+            println("=== END RESPONSE ===")
             when (response.statusCode()) {
                 200 -> parseJsonResponse(response.body())
                 else -> {
@@ -69,15 +72,17 @@ object MalariaApiClient {
 
     private fun parseJsonResponse(json: String): AnalysisResult? {
         return try {
+            println("PARSING JSON: $json")
             val diagnosis = if (json.contains("\"diagnosis\":\"parasitized\"")) "parasitized"
             else if (json.contains("\"diagnosis\":\"uninfected\"")) "uninfected"
             else "error"
 
-            val confidenceMatch = "\"confidence\":([0-9.]+)".toRegex().find(json)
+            val confidenceMatch = "\"confidence\":\\s*([0-9.eE+-]+)".toRegex().find(json)
             val confidence = confidenceMatch?.groupValues?.get(1)?.toDoubleOrNull() ?: 0.0
 
-            val processingTimeMatch = "\"processing_time\":([0-9.]+)".toRegex().find(json)
+            val processingTimeMatch = "\"processing_time\":\\s*([0-9.]+)".toRegex().find(json)
             val processingTime = processingTimeMatch?.groupValues?.get(1)?.toDoubleOrNull() ?: 0.0
+            println("PARSED: diagnosis=$diagnosis, confidence=$confidence, time=$processingTime")
 
             AnalysisResult(
                 diagnosis = diagnosis,
