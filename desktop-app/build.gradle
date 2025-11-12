@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.9.0'
     id 'org.jetbrains.compose' version '1.5.11'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.0'
 }
 
 repositories {
@@ -9,7 +10,6 @@ repositories {
     google()
 }
 
-// Указываем кодировку для совместимости
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
@@ -22,6 +22,15 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 
 dependencies {
     implementation compose.desktop.currentOs
+
+    // Корутины
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+
+    // OkHttp для HTTP запросов
+    implementation "com.squareup.okhttp3:okhttp:4.11.0"
+
+    // Сериализация JSON
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
 }
 
 kotlin {
@@ -43,6 +52,7 @@ compose.desktop {
             packageVersion = "1.0.0"
             description = "AI-powered malaria detection application"
             vendor = "Malaria Detection Team"
+
 
             macOS {
                 bundleID = "com.malaria.detection"

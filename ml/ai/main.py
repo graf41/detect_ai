@@ -61,9 +61,9 @@ torch.backends.cudnn.benchmark = True
 
 SEED = 42
 random.seed(SEED); np.random.seed(SEED); torch.manual_seed(SEED)
-DATA_DIR = Path("../training/data")
-REPORTS  = REPORTS = Path("../ml-api/reports"); REPORTS.mkdir(exist_ok=True)
-IMG_SIZE, BATCH, LR = 224, 16, 3e-4
+DATA_DIR = Path("../../ml/training/data/train")
+REPORTS  = REPORTS = Path("../training"); REPORTS.mkdir(exist_ok=True)
+IMG_SIZE, BATCH, LR = 224, 8, 3e-4
 PATIENCE, EPS       = 2,   1e-4
 
 train_tfms = transforms.Compose([
@@ -81,7 +81,18 @@ if not DATA_DIR.exists():
     raise FileNotFoundError(f"Dataset folder not found: {DATA_DIR}")
 full_ds = datasets.ImageFolder(root=DATA_DIR)
 labels  = np.array(full_ds.targets)
-print(f"Всего изображений: {len(full_ds)} | Классы: {full_ds.classes}")
+# === ДИАГНОСТИКА ДАННЫХ ===
+print("=== ДИАГНОСТИКА ДАННЫХ ===")
+print("Размер датасета:", len(full_ds))
+print("Классы:", full_ds.classes)
+print("Распределение по классам:", np.bincount(labels))
+print("Соотношение классов:", np.bincount(labels) / len(labels))
+
+# Проверь первые несколько изображений
+for i in range(3):
+    img, label = full_ds[i]
+    print(f"Изображение {i}: класс {full_ds.classes[label]}, размер {img.size}")
+# === КОНЕЦ ДИАГНОСТИКИ ===
 
 num_workers = args.workers
 pin_memory   = True
@@ -97,7 +108,7 @@ def make_loader(idxs: List[int], train: bool) -> DataLoader:
 
 def build_model() -> nn.Module:
     model = models.efficientnet_b0(weights=models.EfficientNet_B0_Weights.DEFAULT)
-    for p in model.features.parameters(): p.requires_grad = False
+   # for p in model.features.parameters(): p.requires_grad = False
     model.classifier = nn.Sequential(
         nn.Dropout(0.3),
         nn.Linear(model.classifier[1].in_features, 2)
@@ -168,8 +179,13 @@ if args.folds > 0:
         probs, preds, truths = [], [], []
         with torch.no_grad():
             for x, y in vl_loader:
-                out = net(x.to(device)); p = torch.softmax(out,1)[:,1]
-                probs.extend(p.cpu().numpy()); preds.extend(out.argmax(1).cpu().numpy()); truths.extend(y.numpy())
+                out = net(x.to(device))
+                probs_tensor = torch.softmax(out, 1)
+                predicted_class = out.argmax(1)
+                p = probs_tensor[torch.arange(len(probs_tensor)), predicted_class]
+                probs.extend(p.cpu().numpy());
+                preds.extend(predicted_class.cpu().numpy());
+                truths.extend(y.numpy())
         cv_results.append(compute_metrics(np.array(truths), np.array(probs), np.array(preds)))
     pd.DataFrame(cv_results).to_csv(REPORTS/'cv_metrics.csv', index=False)
     print("CV metrics saved.")
@@ -215,7 +231,10 @@ model.eval()
 probs_tr, preds_tr, truths_tr = [], [], []
 with torch.no_grad():
     for x, y in train_loader:
-        out = model(x.to(device)); p = torch.softmax(out,1)[:,1]
+        out = model(x.to(device))
+        probs_tensor = torch.softmax(out, 1)
+        predicted_class = out.argmax(1)
+        p = probs_tensor[torch.arange(len(probs_tensor)), predicted_class]
         probs_tr.extend(p.cpu().numpy()); preds_tr.extend(out.argmax(1).cpu().numpy()); truths_tr.extend(y.numpy())
 train_metrics = compute_metrics(np.array(truths_tr), np.array(probs_tr), np.array(preds_tr))
 pd.DataFrame([train_metrics]).to_csv(REPORTS/'train_metrics.csv', index=False)
@@ -225,7 +244,10 @@ model.eval()
 probs_te, preds_te, truths_te = [], [], []
 with torch.no_grad():
     for x, y in test_loader:
-        out = model(x.to(device)); p = torch.softmax(out,1)[:,1]
+        out = model(x.to(device))
+        probs_tensor = torch.softmax(out, 1)
+        predicted_class = out.argmax(1)
+        p = probs_tensor[torch.arange(len(probs_tensor)), predicted_class]
         probs_te.extend(p.cpu().numpy()); preds_te.extend(out.argmax(1).cpu().numpy()); truths_te.extend(y.numpy())
 test_metrics = compute_metrics(np.array(truths_te), np.array(probs_te), np.array(preds_te))
 pd.DataFrame([test_metrics]).to_csv(REPORTS/'test_metrics.csv', index=False)

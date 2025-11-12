@@ -39,10 +39,18 @@ ENV/
 *.swp
 *.swo
 .gigaide
+.idea_backup/
+
 
 # Данные и модели
 ml/training/data/
 ml/api/reports/
+ml/training/best.pt
+!ml/training/.gitkeep
+ml/training/*.pt
+ml/training/*.onnx
+ml/training/*.png
+ml/training/*.csv
 
 # ВРЕМЕННЫЕ файлы
 desktop-app/build/
