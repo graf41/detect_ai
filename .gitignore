@@ -46,6 +46,7 @@ ENV/
 ml/training/data/
 ml/api/reports/
 ml/training/best.pt
+!ml/training/.gitkeep
 
 # ВРЕМЕННЫЕ файлы
 desktop-app/build/
