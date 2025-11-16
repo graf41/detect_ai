@@ -8,7 +8,21 @@ import com.malaria.screens.AnalyzeScreen
 import com.malaria.screens.HistoryScreen
 import com.malaria.screens.AboutScreen
 import com.malaria.screens.DatePickerDialog
-
+/**
+ * Точка входа в desktop
+ *
+ * Инициализирует Compose Multiplatform для управления навигацией меж экранами.
+ * Реализует state-based навигацию с управлением диалогами выбора дат.
+ *
+ * ## Архитектура навигации:
+ * - "main" - экран с меню
+ * - "analyze" - экран анализа изображений
+ * - "history" - история анализов с фильтрацией по датам
+ * - "about" - информация о приложении
+ *
+ * @see MainScreen стартовый экран приложения
+ * @see AnalyzeScreen основной рабочий экран анализа
+ */
 fun main() = application {
     var currentScreen by remember { mutableStateOf("main") }
     var showStartDatePicker by remember { mutableStateOf(false) }

@@ -2,6 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.9.0'
     id 'org.jetbrains.compose' version '1.5.11'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.0'
+    id 'org.jetbrains.dokka' version '1.9.10'
 }
 
 repositories {
@@ -22,7 +23,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 
 dependencies {
     implementation compose.desktop.currentOs
-
     // Корутины
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
 
@@ -31,6 +31,12 @@ dependencies {
 
     // Сериализация JSON
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
+
+    // ТЕСТОВЫЕ ЗАВИСИМОСТИ
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
 }
 
 kotlin {
@@ -64,6 +70,31 @@ compose.desktop {
                 upgradeUuid = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
                 perUserInstall = true
                 iconFile.set(project.file("src/main/resources/icon.ico"))
+            }
+        }
+    }
+}
+tasks.dokkaHtml {
+    outputDirectory.set(file("$buildDir/dokka/html"))
+    moduleName.set("Malaria Detection Desktop")
+
+    dokkaSourceSets {
+        named("main") {
+            displayName.set("Malaria Detection")
+            // includes.from("MODULE.md")
+
+            includeNonPublic.set(false)
+            perPackageOption {
+                matchingRegex.set("com\\.malaria\\.*")
+                includeNonPublic.set(false)
+                reportUndocumented.set(true)
+                skipDeprecated.set(false)
+            }
+
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl.set(java.net.URL("https://github.com/your-username/malaria-detection/tree/main/desktop-app/src/main/kotlin"))
+                remoteLineSuffix.set("#L")
             }
         }
     }

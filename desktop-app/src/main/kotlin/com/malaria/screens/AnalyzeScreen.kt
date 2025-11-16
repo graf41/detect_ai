@@ -17,7 +17,25 @@ import java.awt.Frame
 import java.io.File
 import com.malaria.components.AnalysisResult
 import com.malaria.components.MalariaApiClient
-
+/**
+ * Главный экран анализа изображений клеток крови на малярию
+ *
+ * Предоставляет полный интерфейс для загрузки изображений, отправки на ML анализ
+ * и отображения диагностических результатов. Реализует state-менеджмент для
+ * управления процессом анализа и обработки ошибок.
+ *
+ * ## Основной workflow:
+ * 1. Выбор файла через системный диалог
+ * 2. Валидация формата изображения (PNG/JPEG)
+ * 3. Асинхронная отправка на ML сервер
+ * 4. Отображение результатов с цветовой кодировкой
+ * 5. Обработка ошибок сети и анализа
+ *
+ * @param onBackClick callback для возврата на главный экран
+ *
+ * @see MalariaApiClient клиент для взаимодействия с ML бэкендом
+ * @see AnalysisResult модель данных для отображения результатов
+ */
 @Composable
 fun AnalyzeScreen(onBackClick: () -> Unit) {
     var selectedFile by remember { mutableStateOf<String?>(null) }
@@ -144,6 +162,15 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
     }
 }
 
+/**
+ * Компонент для отображения результатов анализа малярии
+ *
+ * Визуализирует диагностическую информацию с цветовой кодировкой
+ *
+ * @param result объект AnalysisResult с данными диагностики
+ *
+ * @see AnalysisResult модель данных для отображения
+ */
 @Composable
 fun AnalysisResultView(result: AnalysisResult) {
     Column(
@@ -188,7 +215,15 @@ fun AnalysisResultView(result: AnalysisResult) {
         )
     }
 }
-
+/**
+ * Компонент отображения ошибок с возможностью закрытия
+ *
+ * Отображает сообщения об ошибках в красном контейнере с кнопкой закрытия.
+ * Используется для показа сетевых ошибок и ошибок валидации.
+ *
+ * @param message текст ошибки для отображения
+ * @param onDismiss callback для скрытия компонента ошибки
+ */
 @Composable
 fun ErrorMessage(message: String, onDismiss: () -> Unit) {
     Row(
@@ -223,7 +258,14 @@ fun ErrorMessage(message: String, onDismiss: () -> Unit) {
         }
     }
 }
-
+/**
+ * Компонент отображения информации о выбранном файле
+ *
+ * Показывает имя файла, путь и формат с возможностью удаления выбора.
+ *
+ * @param filePath полный путь к выбранному файлу
+ * @param onRemove callback для удаления выбранного файла
+ */
 @Composable
 fun FileItem(filePath: String, onRemove: () -> Unit) {
     Row(
@@ -261,7 +303,12 @@ fun FileItem(filePath: String, onRemove: () -> Unit) {
         }
     }
 }
-
+/**
+ * Преобразует диагноз в русскоязычный вариант для UI
+ *
+ * @param englishDiagnosis диагноз на английском от ML модели
+ * @return локализованный диагноз для отображения пользователю
+ */
 private fun getRussianDiagnosis(englishDiagnosis: String): String {
     return when (englishDiagnosis) {
         "parasitized" -> "Заражено"
@@ -270,7 +317,12 @@ private fun getRussianDiagnosis(englishDiagnosis: String): String {
         else -> englishDiagnosis
     }
 }
-
+/**
+ * Открывает системный диалог выбора файла для загрузки изображений
+ *
+ * @param onFileSelected callback при успешном выборе файла
+ * @param onError callback при ошибке выбора файла
+ */
 private fun openFileDialog(
     onFileSelected: (String) -> Unit,
     onError: (String) -> Unit
@@ -293,12 +345,22 @@ private fun openFileDialog(
         }
     }
 }
-
+/**
+ * Проверяет поддержку формата файла для анализа
+ *
+ * @param filePath путь к файлу для проверки
+ * @return true если формат поддерживается (PNG, JPG, JPEG)
+ */
 private fun isSupportedFormat(filePath: String): Boolean {
     val extension = filePath.substringAfterLast(".", "").lowercase()
     return extension == "png" || extension == "jpg" || extension == "jpeg"
 }
-
+/**
+ * Извлекает имя файла из полного пути
+ *
+ * @param filePath полный путь к файлу
+ * @return только имя файла без пути
+ */
 private fun getFileName(filePath: String): String {
     return filePath.substringAfterLast("\\").substringAfterLast("/")
 }

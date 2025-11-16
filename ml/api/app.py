@@ -51,9 +51,9 @@ try:
     model = build_model()
     model.load_state_dict(torch.load('../training/best.pt', map_location=device))
     model.eval()
-    logger.info("✅ Model loaded successfully")
+    logger.info("Model loaded successfully")
 except Exception as e:
-    logger.error(f"❌ Error loading model: {e}")
+    logger.error(f"Error loading model: {e}")
     model = None
 
 
@@ -144,5 +144,5 @@ async def model_info():
 
 
 if __name__ == "__main__":
-    logger.info("🚀 Starting ML API server on http://localhost:8000")
+    logger.info("Starting ML API server on http://localhost:8000")
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
