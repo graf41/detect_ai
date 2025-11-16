@@ -49,7 +49,7 @@ def build_model() -> nn.Module:
 # загрузка модели
 try:
     model = build_model()
-    model.load_state_dict(torch.load('../training/best.pt', map_location=device))
+    model.load_state_dict(torch.load('best.pt', map_location=device))
     model.eval()
     logger.info("Model loaded successfully")
 except Exception as e:

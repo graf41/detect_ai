@@ -52,9 +52,7 @@ ml/training/*.csv
 
 # ВРЕМЕННЫЕ файлы
 desktop-app/build/
-desktop-app/.gradle/
 kotlin-app/build/
-.gradle
 
 # JAR и Java
 *.jar
