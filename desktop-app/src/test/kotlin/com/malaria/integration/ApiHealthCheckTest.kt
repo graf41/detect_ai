@@ -29,6 +29,13 @@ import java.awt.Color
  * - Падает если изменился API контракт
  * - Падает если сервер отвечает слишком медленно
  */
+
+data class TestAnalysisResult(
+    val diagnosis: String,
+    val confidence: Double,
+    val processingTime: Double,
+    val modelUsed: String
+)
 class ApiHealthCheckTest {
 
     private val client = OkHttpClient.Builder()
@@ -141,7 +148,7 @@ class ApiHealthCheckTest {
         }
     }
 
-    private fun performRealAnalysis(imageFile: File = createRealTestImage()): com.malaria.components.AnalysisResult? {
+    private fun performRealAnalysis(imageFile: File = createRealTestImage()): TestAnalysisResult? {
         return try {
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -178,7 +185,7 @@ class ApiHealthCheckTest {
             null
         }
     }
-    private fun validateResponseStructure(result: com.malaria.components.AnalysisResult) {
+    private fun validateResponseStructure(result: TestAnalysisResult) {
         assertTrue(result.diagnosis.isNotEmpty(), "Diagnosis should not be empty")
         assertTrue(
             result.diagnosis == "parasitized" || result.diagnosis == "uninfected",
@@ -226,7 +233,7 @@ class ApiHealthCheckTest {
     }
 
     // Копия парсера из MalariaApiClient
-    private fun parseJsonResponse(json: String): com.malaria.components.AnalysisResult? {
+    private fun parseJsonResponse(json: String): TestAnalysisResult? {
         return try {
             val diagnosis = if (json.contains("\"diagnosis\":\"parasitized\"")) "parasitized"
             else if (json.contains("\"diagnosis\":\"uninfected\"")) "uninfected"
@@ -238,7 +245,7 @@ class ApiHealthCheckTest {
             val processingTimeMatch = "\"processing_time\":\\s*([0-9.]+)".toRegex().find(json)
             val processingTime = processingTimeMatch?.groupValues?.get(1)?.toDoubleOrNull() ?: 0.0
 
-            com.malaria.components.AnalysisResult(
+            TestAnalysisResult(
                 diagnosis = diagnosis,
                 confidence = confidence,
                 processingTime = processingTime,
