@@ -30,4 +30,6 @@ jobs:
       - name: Run tests
         run: |
           cd desktop-app
+          gradle wrapper --gradle-version 8.5
+          chmod +x ./gradlew
           ./gradlew test --tests "*ApiHealthCheckTest*"
