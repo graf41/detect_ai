@@ -30,6 +30,5 @@ jobs:
       - name: Run tests
         run: |
           cd desktop-app
-          gradle wrapper --gradle-version 8.8 --distribution-type all
-          chmod +x ./gradlew
-          ./gradlew test --tests "*ApiHealthCheckTest*"
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          ./gradlew test --tests "*ApiHealthCheckTest*" -Dorg.gradle.java.home=$JAVA_HOME_17_X64
