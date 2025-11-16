@@ -30,4 +30,4 @@ jobs:
       - name: Run tests
         run: |
           cd desktop-app
-          gradle test --tests "*ApiHealthCheckTest*"
+          ./gradlew test --tests "*ApiHealthCheckTest*"
