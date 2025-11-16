@@ -27,6 +27,5 @@ jobs:
           until curl -f http://localhost:8000/health; do
             sleep 5
             done
-
       - name: Run tests
-        run: ./gradlew test --tests "*ApiHealthCheckTest*"
+        run: gradle test --tests "*ApiHealthCheckTest*"
