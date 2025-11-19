@@ -64,6 +64,9 @@ desktop-app/build/libs/
 *.dmg
 *.msi
 *.exe
+*.pkg
+.gradle/
+build/
 
 # IDE/Gradle
 *.iml
@@ -73,3 +76,12 @@ kapitol/
 *.log
 logs/
 EOF
+
+# Базы данных
+*.db
+*.db-journal
+!malaria_analyses.db.example
+
+# Docker
+docker-compose.override.yml
+

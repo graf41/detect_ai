@@ -32,11 +32,19 @@ dependencies {
     // Сериализация JSON
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
 
+    // Зависимости бд
+    implementation "org.jetbrains.exposed:exposed-core:0.44.0"
+    implementation "org.jetbrains.exposed:exposed-dao:0.44.0"
+    implementation "org.jetbrains.exposed:exposed-jdbc:0.44.0"
+    implementation "org.xerial:sqlite-jdbc:3.42.0.0"
+    implementation "org.jetbrains.exposed:exposed-java-time:0.44.0"
+
     // ТЕСТОВЫЕ ЗАВИСИМОСТИ
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+
 }
 
 kotlin {
@@ -48,8 +56,11 @@ compose.desktop {
         mainClass = "com.malaria.MainKt"
 
         nativeDistributions {
+            // ДОБАВЬ ЭТУ СТРОКУ:
+            modules("java.sql", "java.naming", "java.management", "jdk.unsupported")
+
             targetFormats(
-                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg,
+                    org.jetbrains.compose.desktop.application.dsl.TargetFormat.Pkg,
                     org.jetbrains.compose.desktop.application.dsl.TargetFormat.Exe,
                     org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi
             )
@@ -59,10 +70,10 @@ compose.desktop {
             description = "AI-powered malaria detection application"
             vendor = "Malaria Detection Team"
 
-
             macOS {
                 bundleID = "com.malaria.detection"
                 iconFile.set(project.file("src/main/resources/icon.icns"))
+                dockName = "Malaria Detection"
             }
 
             windows {

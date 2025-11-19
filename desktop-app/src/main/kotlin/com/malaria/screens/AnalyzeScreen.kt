@@ -17,6 +17,8 @@ import java.awt.Frame
 import java.io.File
 import com.malaria.components.AnalysisResult
 import com.malaria.components.MalariaApiClient
+import com.malaria.data.AnalysisRecord
+import com.malaria.repository.AnalysisRepository
 /**
  * Главный экран анализа изображений клеток крови на малярию
  *
@@ -43,6 +45,7 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
     var isLoading by remember { mutableStateOf(false) }
     var analysisResult by remember { mutableStateOf<AnalysisResult?>(null) }
     val coroutineScope = rememberCoroutineScope()
+    val analysisRepository = remember { AnalysisRepository() }
 
     Column(
         modifier = Modifier
@@ -57,6 +60,16 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
         )
 
         Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = "⚠️ Это приложение предназначено исключительно для вспомогательных целей " +
+                    "и не заменяет профессиональную медицинскую консультацию.",
+            fontSize = 12.sp,
+            color = Color(0xFFFFCCCB),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0x80D32F2F))
+                .padding(12.dp)
+        )
 
         Button(
             onClick = {
@@ -73,10 +86,10 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Загрузить изображение", color = Color.Black)
+            Text("Загрузить изображение", color = Color.White)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         if (errorMessage != null) {
             ErrorMessage(
@@ -109,7 +122,7 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
         }
         analysisResult?.let { result ->
             AnalysisResultView(result = result)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
 
         Button(
@@ -129,13 +142,30 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
                             if (result != null) {
                                 analysisResult = result
                                 println("Результат установлен в UI")
+                                try {
+                                    val record = AnalysisRecord(
+                                        imagePath = selectedFile!!,
+                                        fileName = getFileName(selectedFile!!),
+                                        diagnosis = result.diagnosis,
+                                        confidence = result.confidence,
+                                        processingTime = result.processingTime,
+                                        modelUsed = result.modelUsed
+                                    )
+                                    val savedId = analysisRepository.saveAnalysis(record) // используй существующий репозиторий
+                                    println("✅ Результат сохранен в БД с ID: $savedId")
+                                } catch (e: Exception) {
+                                    println("❌ Ошибка сохранения в БД: ${e.message}")
+                                }
+
                             } else {
                                 errorMessage = "Не удалось подключиться к серверу анализа"
                                 println("Результат null")
                             }
+
                         } catch (e: Exception) {
                             println("Ошибка: ${e.message}")
                             errorMessage = "Ошибка: ${e.message}"
+
                         } finally {
                             isLoading = false
                         }
@@ -157,7 +187,7 @@ fun AnalyzeScreen(onBackClick: () -> Unit) {
             onClick = onBackClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Вернуться на главную", color = Color.Black)
+            Text("Вернуться на главную", color = Color.White)
         }
     }
 }
