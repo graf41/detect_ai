@@ -8,10 +8,15 @@ Desktop приложение для автоматической диагнос�
 - **Экспорт результатов** в удобном формате для отчетности
 
 ### Главный экран
-<img width="912" height="712" alt="Снимок экрана 2025-11-13 в 00 20 27" src="https://github.com/user-attachments/assets/43f5cb91-3d92-49f6-9cdc-bcf222bf0dea" />
+<img width="912" height="712" alt="image" src="https://github.com/user-attachments/assets/b145474f-e1fe-4686-949e-02a3348d9179" />
+
 
 ### Пример анализа
 <img width="868" height="668" alt="Снимок экрана 2025-11-12 в 22 44 48" src="https://github.com/user-attachments/assets/b98c9863-8092-4dff-b242-ab14cde136ac" />
+
+### Кнопка "история анализов"
+<img width="955" height="786" alt="image" src="https://github.com/user-attachments/assets/3f1b5541-1311-494f-9766-5b2f414a9746" />
+
 
 ## 🧩 Архитектура
 ### Frontend
