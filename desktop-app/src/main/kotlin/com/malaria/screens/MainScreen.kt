@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Brush
 
 @Composable
 fun MainScreen(
@@ -20,7 +21,9 @@ fun MainScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF929292))
+            .background(brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+            ))
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -39,7 +42,7 @@ fun MainScreen(
                 .fillMaxWidth(0.6f)
                 .height(60.dp)
         ) {
-            Text("Анализировать изображение", color = Color.Black)
+            Text("Анализировать изображение", color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -50,7 +53,7 @@ fun MainScreen(
                 .fillMaxWidth(0.6f)
                 .height(60.dp)
         ) {
-            Text("История анализов", color = Color.Black)
+            Text("История анализов", color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -61,7 +64,7 @@ fun MainScreen(
                 .fillMaxWidth(0.6f)
                 .height(60.dp)
         ) {
-            Text("О приложении", color = Color.Black)
+            Text("О приложении", color = Color.White)
         }
     }
 }
